@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "astra",
+  "version": "1.0.0",
+  "name": "Astra Client",
+  "description": "Astra Launcher client mod: settings GUI (Right Shift), fullbright, keystrokes, CPS, FPS, name tag logo.",
+  "environment": "client",
+  "entrypoints": { "client": ["hu.astra.client.AstraClient"] },
+  "mixins": ["astra.mixins.json"],
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

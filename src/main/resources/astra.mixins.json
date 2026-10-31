@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "hu.astra.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["HudMixin", "NameMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
