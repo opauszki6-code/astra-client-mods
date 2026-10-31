@@ -3,9 +3,10 @@ package hu.astra.client;
 import com.google.gson.JsonParser;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import org.lwjgl.glfw.GLFW;
 
 import java.net.URI;
@@ -27,19 +28,21 @@ public class AstraClient implements ClientModInitializer {
     public void onInitializeClient() {
         load();
         startUserFetch();
+        HudRenderCallback.EVENT.register((graphics, tickCounter) -> AstraHud.draw(graphics));
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-            boolean down = GLFW.glfwGetKey(mc.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS;
+            long window = GLFW.glfwGetCurrentContext();
+            boolean down = window != 0 && GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS;
             if (down && !wasDown) {
-                if (mc.currentScreen == null && mc.world != null) mc.setScreen(new AstraScreen());
-                else if (mc.currentScreen instanceof AstraScreen) mc.setScreen(null);
+                if (mc.screen == null && mc.level != null) mc.setScreen(new AstraScreen());
+                else if (mc.screen instanceof AstraScreen) mc.setScreen(null);
             }
             wasDown = down;
             if (mc.player == null) return;
             if (fullbright) {
-                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 0, false, false));
+                mc.player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 1000, 0, false, false));
                 fbApplied = true;
             } else if (fbApplied) {
-                mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+                mc.player.removeEffect(MobEffects.NIGHT_VISION);
                 fbApplied = false;
             }
         });
@@ -68,7 +71,7 @@ public class AstraClient implements ClientModInitializer {
         } catch (Exception ignored) {}
     }
 
-    // Lekéri a launcheres játékosok listáját (a launcher írja a szerver címet az astra-server.txt-be)
+    // The launcher writes the server address into config/astra-server.txt
     private static void startUserFetch() {
         Thread t = new Thread(() -> {
             while (true) {

@@ -1,15 +1,15 @@
 package hu.astra.client;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class AstraScreen extends Screen {
-    public AstraScreen() { super(Text.literal("Astra Client")); }
+    public AstraScreen() { super(Component.literal("Astra Client")); }
 
     @Override
     protected void init() {
@@ -21,22 +21,19 @@ public class AstraScreen extends Screen {
     }
 
     private void toggle(String name, BooleanSupplier get, Consumer<Boolean> set, int x, int y) {
-        addDrawableChild(ButtonWidget.builder(label(name, get.getAsBoolean()), b -> {
+        addRenderableWidget(Button.builder(label(name, get.getAsBoolean()), b -> {
             set.accept(!get.getAsBoolean());
             b.setMessage(label(name, get.getAsBoolean()));
             AstraClient.save();
-        }).dimensions(x, y, 200, 20).build());
+        }).bounds(x, y, 200, 20).build());
     }
 
-    private static Text label(String name, boolean on) { return Text.literal(name + ": " + (on ? "ON" : "OFF")); }
+    private static Component label(String name, boolean on) { return Component.literal(name + ": " + (on ? "ON" : "OFF")); }
 
     @Override
-    public void render(DrawContext c, int mx, int my, float delta) {
-        super.render(c, mx, my, delta);
-        c.drawCenteredTextWithShadow(textRenderer, "Astra Client - Settings", width / 2, height / 4 - 20, 0xFFFFFFFF);
-        c.drawCenteredTextWithShadow(textRenderer, "Press Right Shift to close", width / 2, height / 4 + 104, 0xFF9AA0C0);
+    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
+        super.render(g, mouseX, mouseY, delta);
+        g.drawCenteredString(font, "Astra Client - Settings", width / 2, height / 4 - 20, 0xFFFFFFFF);
+        g.drawCenteredString(font, "Press Right Shift to close", width / 2, height / 4 + 104, 0xFF9AA0C0);
     }
-
-    @Override
-    public boolean shouldPause() { return false; }
 }
